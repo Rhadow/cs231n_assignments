@@ -102,3 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Dataset
+assignment1/cs231n/datasets/cifar-10-batches-py
