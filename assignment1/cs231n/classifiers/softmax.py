@@ -29,7 +29,33 @@ def softmax_loss_naive(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  m = X.shape[0]
+  for i in range(m):
+        x_i = X[i]
+        y_i = y[i]
+        score = x_i.dot(W)
+        stable_score = score - np.max(score)
+        exp_sum = 0
+        target = 0
+        for i, score in enumerate(stable_score):
+            exp_score = np.exp(score)
+            exp_sum += exp_score
+            if i == y_i:
+                target = exp_score
+        for i, score in enumerate(stable_score):
+            exp_score = np.exp(score)
+            scale = exp_score / exp_sum
+            if i == y_i:
+                dW[:, i] += ((scale - 1) * x_i).T
+            else:
+                dW[:, i] += (scale * x_i).T
+        final_score = target / exp_sum
+        loss += -np.log(final_score)
+
+  loss /= m
+  loss += reg * np.sum(W * W)
+  dW /= m
+  dW += 2 * reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -53,7 +79,21 @@ def softmax_loss_vectorized(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  m = X.shape[0]
+
+  # Loss Calculation
+  logits = X.dot(W)
+  stable_logits = logits - np.max(logits, axis=1, keepdims=True)
+  scores = np.exp(stable_logits) / np.sum(np.exp(stable_logits), axis=1, keepdims=True)
+  loss = np.sum(-np.log(scores[np.arange(m), y]))
+  loss /= m
+  loss += reg * np.sum(W * W)
+  
+  # Gradient Calculation
+  scores[np.arange(m), y] -= 1
+  dW = X.T.dot(scores)
+  dW /= m
+  dW += 2 * reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
