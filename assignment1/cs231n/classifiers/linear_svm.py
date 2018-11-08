@@ -28,19 +28,25 @@ def svm_loss_naive(W, X, y, reg):
   for i in range(num_train):
     scores = X[i].dot(W)
     correct_class_score = scores[y[i]]
+    num_classes_over_margin = 0
     for j in range(num_classes):
       if j == y[i]:
         continue
       margin = scores[j] - correct_class_score + 1 # note delta = 1
       if margin > 0:
+        num_classes_over_margin += 1
+        dW[:, j] += X[i].T
         loss += margin
-
+    dW[:, y[i]] += -(X[i] * num_classes_over_margin).T
+     
+  dW /= num_train
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
   loss /= num_train
 
   # Add regularization to the loss.
   loss += reg * np.sum(W * W)
+  dW += 2 * reg * W
 
   #############################################################################
   # TODO:                                                                     #
@@ -69,7 +75,13 @@ def svm_loss_vectorized(W, X, y, reg):
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  pass
+  scores = X.dot(W)
+  y_scores = scores[np.arange(len(X)), y].reshape(len(X), -1)
+  scores = scores - y_scores + 1
+  scores[np.arange(len(X)), y] = 0
+  margins = np.maximum(0, scores)
+  loss = np.sum(margins) / X.shape[0]
+  loss += reg * np.sum(W * W)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -84,7 +96,14 @@ def svm_loss_vectorized(W, X, y, reg):
   # to reuse some of the intermediate values that you used to compute the     #
   # loss.                                                                     #
   #############################################################################
-  pass
+  mask = margins > 0
+  num_over_margin = np.sum(mask, axis=1).reshape(-1, 1)
+  dW = X.T.dot(mask)
+  mask2 = scores == 0
+  mask2 = mask2.astype(int) * num_over_margin
+  dW -= X.T.dot(mask2)
+  dW /= X.shape[0]
+  dW += 2 * reg * W
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
