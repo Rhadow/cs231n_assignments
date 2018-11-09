@@ -29,6 +29,7 @@ def softmax_loss_naive(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
+  #  Good article on softmax gradient derivation: https://madalinabuzau.github.io/2016/11/29/gradient-descent-on-a-softmax-cross-entropy-cost-function.html    
   m = X.shape[0]
   for i in range(m):
         x_i = X[i]
