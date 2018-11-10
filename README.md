@@ -8,7 +8,7 @@ This repository contains my solutions to the assignments of the [CS231n](http://
 - [x] [Q2](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment1/svm.ipynb): Training a Support Vector Machine.
 - [x] [Q3](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment1/softmax.ipynb): Implement a Softmax classifier.
 - [x] [Q4](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment1/two_layer_net.ipynb): Two-Layer Neural Network.
-- [ ] [Q5](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment1/features.ipynb): Higher Level Representations: Image Features.
+- [x] [Q5](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment1/features.ipynb): Higher Level Representations: Image Features.
 
 ### Assignment 2:
 - [ ] [Q1](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/FullyConnectedNets.ipynb): Fully-connected Neural Network.

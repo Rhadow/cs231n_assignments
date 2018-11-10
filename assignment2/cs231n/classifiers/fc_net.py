@@ -255,6 +255,11 @@ class FullyConnectedNet(object):
             scores, cache = affine_forward(scores, W, b)
             caches[f'a{i + 1}'] = cache
             if i != self.num_layers - 1:
+                if self.normalization=='batchnorm':
+                    gamma = self.params[f'gamma{i + 1}']
+                    beta = self.params[f'beta{i + 1}']
+                    scores, cache = batchnorm_forward(scores, gamma, beta, self.bn_params[i])
+                    caches[f'bn{i + 1}'] = cache
                 scores, cache = relu_forward(scores)
                 caches[f'r{i + 1}'] = cache
             W_total += np.sum(W * W)
@@ -285,6 +290,10 @@ class FullyConnectedNet(object):
         for i in range(self.num_layers, 0, -1):
             if i != self.num_layers:
                 dout = relu_backward(dout, caches[f'r{i}'])
+                if self.normalization=='batchnorm':
+                    dout, dgamma, dbeta = batchnorm_backward_alt(dout, caches[f'bn{i}'])
+                    grads[f'gamma{i}'] = dgamma
+                    grads[f'beta{i}'] = dbeta
             dout, dW, db = affine_backward(dout, caches[f'a{i}'])
             W = caches[f'a{i}'][1]
             grads[f'W{i}'] = dW + self.reg * W
