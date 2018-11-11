@@ -183,7 +183,7 @@ class FullyConnectedNet(object):
         for i in range(self.num_layers - 1):
             self.params[f'W{i + 1}'] = np.random.normal(0.0, weight_scale, (hidden_dims[i - 1] if i > 0 else input_dim, hidden_dims[i]))
             self.params[f'b{i + 1}'] = np.zeros((hidden_dims[i],))
-            if self.normalization == 'batchnorm':
+            if self.normalization in ['batchnorm', 'layernorm']:
                 self.params[f'gamma{i + 1}'] = np.ones((hidden_dims[i],))
                 self.params[f'beta{i + 1}'] = np.zeros((hidden_dims[i],))
         self.params[f'W{self.num_layers}'] = np.random.normal(0.0, weight_scale, (hidden_dims[-1], num_classes))
@@ -260,6 +260,11 @@ class FullyConnectedNet(object):
                     beta = self.params[f'beta{i + 1}']
                     scores, cache = batchnorm_forward(scores, gamma, beta, self.bn_params[i])
                     caches[f'bn{i + 1}'] = cache
+                elif self.normalization=='layernorm':
+                    gamma = self.params[f'gamma{i + 1}']
+                    beta = self.params[f'beta{i + 1}']
+                    scores, cache = layernorm_forward(scores, gamma, beta, self.bn_params[i])
+                    caches[f'bn{i + 1}'] = cache
                 scores, cache = relu_forward(scores)
                 caches[f'r{i + 1}'] = cache
             W_total += np.sum(W * W)
@@ -292,6 +297,10 @@ class FullyConnectedNet(object):
                 dout = relu_backward(dout, caches[f'r{i}'])
                 if self.normalization=='batchnorm':
                     dout, dgamma, dbeta = batchnorm_backward_alt(dout, caches[f'bn{i}'])
+                    grads[f'gamma{i}'] = dgamma
+                    grads[f'beta{i}'] = dbeta
+                elif self.normalization=='layernorm':
+                    dout, dgamma, dbeta = layernorm_backward(dout, caches[f'bn{i}'])
                     grads[f'gamma{i}'] = dgamma
                     grads[f'beta{i}'] = dbeta
             dout, dW, db = affine_backward(dout, caches[f'a{i}'])

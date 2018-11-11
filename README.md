@@ -12,7 +12,7 @@ This repository contains my solutions to the assignments of the [CS231n](http://
 
 ### Assignment 2:
 - [ ] [Q1](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/FullyConnectedNets.ipynb): Fully-connected Neural Network.
-- [ ] [Q2](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/BatchNormalization.ipynb): Batch Normalization.
+- [x] [Q2](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/BatchNormalization.ipynb): Batch Normalization.
 - [ ] [Q3](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/Dropout.ipynb): Dropout.
 - [ ] [Q4](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/ConvolutionalNetworks.ipynb): Convolutional Networks.
 - [ ] [Q5](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/TensorFlow.ipynb): PyTorch / TensorFlow on CIFAR-10.

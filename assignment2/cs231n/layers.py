@@ -351,7 +351,18 @@ def layernorm_forward(x, gamma, beta, ln_param):
     # transformations you could perform, that would enable you to copy over   #
     # the batch norm code and leave it almost unchanged?                      #
     ###########################################################################
-    pass
+    
+    origin_x = x
+    x = x.T
+    D, N = x.shape
+    
+    sample_mean = np.mean(x, axis=0, keepdims=True)
+    sample_var = np.sum(np.square(x - sample_mean), axis=0) / D
+    x_norm = ((x - sample_mean) / np.sqrt(sample_var + eps)).T
+    out = gamma * x_norm + beta
+    cache = (origin_x, x , sample_mean, sample_var, x_norm, gamma, beta, eps)
+    
+    
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -382,7 +393,41 @@ def layernorm_backward(dout, cache):
     # implementation of batch normalization. The hints to the forward pass    #
     # still apply!                                                            #
     ###########################################################################
-    pass
+    
+    origin_x, x, sample_mean, sample_var, x_norm, gamma, beta, eps = cache
+    dbeta = np.sum(dout, axis=0)
+    dgamma = np.sum(dout * x_norm, axis=0)
+    dx_norm = dout * gamma
+    
+    # xnorm = x_m_mean * one_over_sqrt_var_eps
+    # one_over_sqrt_var_eps = 1 / sqrt_var_eps
+    # sqrt_var_eps = np.sqrt(var_p_eps)
+    # var_p_eps = var + eps
+    # var = sum(x_m_mean_sq) / N
+    # x_m_mean_sq = x_m_mean ** 2
+    # x_m_mean = x - meanx
+    # meanx = sum(x) / N
+    
+    var_p_eps = sample_var + eps
+    sqrt_var_eps = np.sqrt(var_p_eps)
+    one_over_sqrt_var_eps = 1 / sqrt_var_eps
+    x_m_mean = x - sample_mean
+    N = x.shape[0]
+    
+    dx_m_mean = dx_norm.T * one_over_sqrt_var_eps
+    # done_over_sqrt_var_eps has shape(D,)
+    done_over_sqrt_var_eps = np.sum(dx_norm.T * x_m_mean, axis=0)
+    dsqrt_var_eps = done_over_sqrt_var_eps * -1 / (sqrt_var_eps ** 2)
+    dvar_p_eps = dsqrt_var_eps * 0.5 * 1 / np.sqrt(var_p_eps)
+    dvar = dvar_p_eps
+    dx_m_mean_sq = dvar * (1 / N) * np.ones(x.shape)
+    dx_m_mean += dx_m_mean_sq * 2 * x_m_mean
+    dx = dx_m_mean
+    # dmeanx has shape (D,)
+    dmeanx = np.sum(-dx_m_mean, axis=0)
+    dx += dmeanx / N * np.ones(x.shape)
+    dx = dx.T
+    
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
