@@ -15,7 +15,6 @@ class TwoLayerNet(object):
     The architecure should be affine - relu - affine - softmax.
 
     Note that this class does not implement gradient descent; instead, it
-    will interact with a separate Solver object that is responsible for running
     optimization.
 
     The learnable parameters of the model are stored in the dictionary
@@ -267,6 +266,9 @@ class FullyConnectedNet(object):
                     caches[f'bn{i + 1}'] = cache
                 scores, cache = relu_forward(scores)
                 caches[f'r{i + 1}'] = cache
+                if self.use_dropout:
+                    scores, cache = dropout_forward(scores, self.dropout_param)
+                    caches[f'do{i + 1}'] = cache
             W_total += np.sum(W * W)
         ############################################################################
         #                             END OF YOUR CODE                             #
@@ -294,6 +296,8 @@ class FullyConnectedNet(object):
         loss += 0.5 * self.reg * W_total
         for i in range(self.num_layers, 0, -1):
             if i != self.num_layers:
+                if self.use_dropout:
+                    dout = dropout_backward(dout, caches[f'do{i}'])
                 dout = relu_backward(dout, caches[f'r{i}'])
                 if self.normalization=='batchnorm':
                     dout, dgamma, dbeta = batchnorm_backward_alt(dout, caches[f'bn{i}'])
