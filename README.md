@@ -11,7 +11,7 @@ This repository contains my solutions to the assignments of the [CS231n](http://
 - [x] [Q5](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment1/features.ipynb): Higher Level Representations: Image Features.
 
 ### Assignment 2:
-- [ ] [Q1](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/FullyConnectedNets.ipynb): Fully-connected Neural Network.
+- [x] [Q1](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/FullyConnectedNets.ipynb): Fully-connected Neural Network.
 - [x] [Q2](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/BatchNormalization.ipynb): Batch Normalization.
 - [x] [Q3](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/Dropout.ipynb): Dropout.
 - [ ] [Q4](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/ConvolutionalNetworks.ipynb): Convolutional Networks.
