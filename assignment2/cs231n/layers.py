@@ -550,7 +550,31 @@ def conv_forward_naive(x, w, b, conv_param):
     # TODO: Implement the convolutional forward pass.                         #
     # Hint: you can use the function np.pad for padding.                      #
     ###########################################################################
-    pass
+    stride = conv_param['stride']
+    padding = conv_param['pad']
+    
+    N, C, H, W = x.shape
+    F, C, HH, WW = w.shape
+    H_p = int(1 + (H + 2 * padding - HH) / stride)
+    W_p = int(1 + (W + 2 * padding - WW) / stride)
+    
+    out = np.zeros((N, F, H_p, W_p))
+    for i in range(N):
+        for f in range(F):
+            cur_w = w[f]
+            cur_x = x[i]
+            padding_shape = ((0, 0), (padding, padding), (padding, padding))
+            cur_x_padded = np.pad(cur_x, padding_shape, 'constant', constant_values=(0))
+            temp = np.zeros((H_p, W_p))
+            for row in range(H_p):
+                for col in range(W_p):
+                    row_start = row * stride
+                    row_end = row_start + HH
+                    col_start = col * stride
+                    col_end = col_start + WW
+                    reception_area = cur_x_padded[:, row_start:row_end, col_start:col_end]
+                    temp[row, col] = np.sum(np.multiply(reception_area, cur_w)) + b[f]
+            out[i, f] = temp
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -575,7 +599,49 @@ def conv_backward_naive(dout, cache):
     ###########################################################################
     # TODO: Implement the convolutional backward pass.                        #
     ###########################################################################
-    pass
+    
+    x, w, b, conv_param = cache
+    
+#     - x: Input data of shape (N, C, H, W)
+#     - w: Filter weights of shape (F, C, HH, WW)
+#     - b: Biases, of shape (F,)
+#     - out: Output data, of shape (N, F, H', W')
+    
+    stride = conv_param['stride']
+    padding = conv_param['pad']
+    
+    N, C, H, W = x.shape
+    F, C, HH, WW = w.shape
+    H_p = int(1 + (H + 2 * padding - HH) / stride)
+    W_p = int(1 + (W + 2 * padding - WW) / stride)
+    
+    db = np.zeros((F,))
+    dw = np.zeros((F, C, HH, WW))
+    dx = np.zeros((N, C, H, W))
+    padding_shape = ((0, 0), (padding, padding), (padding, padding))
+    
+
+    for i in range(N):
+        temp_dx = np.zeros((C, H, W))
+        temp_dx_padded = np.pad(temp_dx, padding_shape, 'constant', constant_values=(0))
+        for f in range(F):
+            cur_dout = dout[i, f]
+            db[f] += np.sum(cur_dout)
+            cur_w = w[f]
+            cur_x = x[i]
+            cur_x_padded = np.pad(cur_x, padding_shape, 'constant', constant_values=(0))
+            for row in range(H_p):
+                for col in range(W_p):
+                    dout_row_col = cur_dout[row, col]
+                    row_start = row * stride
+                    row_end = row_start + HH
+                    col_start = col * stride
+                    col_end = col_start + WW
+                    reception_area = cur_x_padded[:, row_start:row_end, col_start:col_end]
+                    dw[f] += reception_area * dout_row_col
+                    temp_dx_padded[:, row_start:row_end, col_start:col_end] += dout_row_col * cur_w
+        dx[i] += temp_dx_padded[:, padding:-padding, padding:-padding]
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -605,7 +671,26 @@ def max_pool_forward_naive(x, pool_param):
     ###########################################################################
     # TODO: Implement the max-pooling forward pass                            #
     ###########################################################################
-    pass
+    N, C, H, W = x.shape
+    pool_height = pool_param['pool_height']
+    pool_width = pool_param['pool_width']
+    stride = pool_param['stride']
+    H_p = int(1 + (H - pool_height) / stride)
+    W_p = int(1 + (W - pool_width) / stride)
+    out = np.zeros((N, C, H_p, W_p))
+    
+    for i in range(N):
+        for c in range(C):
+            for row in range(H_p):
+                for col in range(W_p):
+                    row_start = row * stride
+                    row_end = row_start + pool_height
+                    col_start = col * stride
+                    col_end = col_start + pool_width
+                    reception_area = x[i, c, row_start:row_end, col_start:col_end]
+                    out[i, c, row, col] = np.max(reception_area)
+    
+    
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -628,7 +713,33 @@ def max_pool_backward_naive(dout, cache):
     ###########################################################################
     # TODO: Implement the max-pooling backward pass                           #
     ###########################################################################
-    pass
+    x, pool_param = cache
+    N, C, H, W = x.shape
+    pool_height = pool_param['pool_height']
+    pool_width = pool_param['pool_width']
+    stride = pool_param['stride']
+    H_p = int(1 + (H - pool_height) / stride)
+    W_p = int(1 + (W - pool_width) / stride)
+    dx = np.zeros(x.shape)
+    
+    
+#     dx: shape (N, C, H, W)
+#     dout: shape (N, C, H', W')
+
+    for i in range(N):
+        temp_dx = np.zeros((C, H, W))
+        for c in range(C):
+            for row in range(H_p):
+                for col in range(W_p):
+                    cur_dout = dout[i, c, row, col]
+                    
+                    row_start = row * stride
+                    row_end = row_start + pool_height
+                    col_start = col * stride
+                    col_end = col_start + pool_width
+                    reception_area = x[i, c, row_start:row_end, col_start:col_end]
+                    temp_dx[c, row_start:row_end, col_start:col_end] += (reception_area == np.max(reception_area))*cur_dout
+        dx[i] = temp_dx
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
