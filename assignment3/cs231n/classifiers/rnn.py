@@ -140,7 +140,29 @@ class CaptioningRNN(object):
         # Note also that you are allowed to make use of functions from layers.py   #
         # in your implementation, if needed.                                       #
         ############################################################################
-        pass
+        af1_out = np.dot(features, W_proj) + b_proj
+        emb1_out, emb1_cache = word_embedding_forward(captions_in, W_embed)
+        if self.cell_type == "rnn":
+            rnn1_out, rnn1_cache = rnn_forward(emb1_out, af1_out, Wx, Wh, b)
+        else:
+            raise ValueError('LSTM not supported yet')
+        af2_out, af2_cache = temporal_affine_forward(rnn1_out, W_vocab, b_vocab)
+        loss, dout = temporal_softmax_loss(af2_out, captions_out, mask)
+        
+#         Calculate gradients
+        drnn1, dw, db = temporal_affine_backward(dout, af2_cache)
+        grads['W_vocab'] = dw
+        grads['b_vocab'] = db
+        demb1, daf1, dWx, dWh, db = rnn_backward(drnn1, rnn1_cache)
+        grads['Wx'] = dWx
+        grads['Wh'] = dWh
+        grads['b'] = db
+        dw = word_embedding_backward(demb1, emb1_cache)
+        grads['W_embed'] = dw
+        grads['W_proj'] = np.dot(features.T, daf1)
+        grads['b_proj'] = np.sum(daf1, axis=0)
+        
+        
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -205,7 +227,15 @@ class CaptioningRNN(object):
         # NOTE: we are still working over minibatches in this function. Also if   #
         # you are using an LSTM, initialize the first cell state to zeros.        #
         ###########################################################################
-        pass
+        h_prev = np.dot(features, W_proj) + b_proj
+        x_prev = np.zeros((N,), dtype=np.int32)
+        x_prev.fill(self._start)
+        for t in range(max_length):
+            emb_prev, _ = word_embedding_forward(x_prev, W_embed)
+            h_prev, _ = rnn_step_forward(emb_prev, h_prev, Wx, Wh, b)
+            scores = np.dot(h_prev, W_vocab) + b_vocab
+            x_prev = np.argmax(scores, axis=1)
+            captions[:, t] = x_prev
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
