@@ -14,8 +14,8 @@ This repository contains my solutions to the assignments of the [CS231n](http://
 - [x] [Q1](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/FullyConnectedNets.ipynb): Fully-connected Neural Network.
 - [x] [Q2](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/BatchNormalization.ipynb): Batch Normalization.
 - [x] [Q3](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/Dropout.ipynb): Dropout.
-- [ ] [Q4](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/ConvolutionalNetworks.ipynb): Convolutional Networks.
-- [ ] [Q5](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/TensorFlow.ipynb): PyTorch / TensorFlow on CIFAR-10.
+- [x] [Q4](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/ConvolutionalNetworks.ipynb): Convolutional Networks.
+- [x] [Q5](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment2/TensorFlow.ipynb): PyTorch / TensorFlow on CIFAR-10.
 
 ### Assignment 3:
 - [ ] [Q1](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment3/RNN_Captioning.ipynb): Image Captioning with Vanilla RNNs.
