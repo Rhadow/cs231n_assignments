@@ -19,7 +19,7 @@ This repository contains my solutions to the assignments of the [CS231n](http://
 
 ### Assignment 3:
 - [x] [Q1](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment3/RNN_Captioning.ipynb): Image Captioning with Vanilla RNNs.
-- [ ] [Q2](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment3/LSTM_Captioning.ipynb): Image Captioning with LSTMs.
+- [x] [Q2](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment3/LSTM_Captioning.ipynb): Image Captioning with LSTMs.
 - [ ] [Q3](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment3/NetworkVisualization-TensorFlow.ipynb): Network Visualization: Saliency maps, Class Visualization, and Fooling Images.
 - [ ] [Q4](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment3/StyleTransfer-TensorFlow.ipynb): Style Transfer.
 - [ ] [Q5](https://github.com/Rhadow/cs231n_assignments/blob/master/assignment3/GANs-TensorFlow.ipynb): Generative Adversarial Networks.

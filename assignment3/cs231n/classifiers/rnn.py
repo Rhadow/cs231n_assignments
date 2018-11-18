@@ -145,7 +145,7 @@ class CaptioningRNN(object):
         if self.cell_type == "rnn":
             rnn1_out, rnn1_cache = rnn_forward(emb1_out, af1_out, Wx, Wh, b)
         else:
-            raise ValueError('LSTM not supported yet')
+            rnn1_out, rnn1_cache = lstm_forward(emb1_out, af1_out, Wx, Wh, b)
         af2_out, af2_cache = temporal_affine_forward(rnn1_out, W_vocab, b_vocab)
         loss, dout = temporal_softmax_loss(af2_out, captions_out, mask)
         
@@ -153,7 +153,10 @@ class CaptioningRNN(object):
         drnn1, dw, db = temporal_affine_backward(dout, af2_cache)
         grads['W_vocab'] = dw
         grads['b_vocab'] = db
-        demb1, daf1, dWx, dWh, db = rnn_backward(drnn1, rnn1_cache)
+        if self.cell_type == "rnn":
+            demb1, daf1, dWx, dWh, db = rnn_backward(drnn1, rnn1_cache)
+        else:
+            demb1, daf1, dWx, dWh, db = lstm_backward(drnn1, rnn1_cache)
         grads['Wx'] = dWx
         grads['Wh'] = dWh
         grads['b'] = db
@@ -230,9 +233,13 @@ class CaptioningRNN(object):
         h_prev = np.dot(features, W_proj) + b_proj
         x_prev = np.zeros((N,), dtype=np.int32)
         x_prev.fill(self._start)
+        c_prev = np.zeros(h_prev.shape)
         for t in range(max_length):
             emb_prev, _ = word_embedding_forward(x_prev, W_embed)
-            h_prev, _ = rnn_step_forward(emb_prev, h_prev, Wx, Wh, b)
+            if self.cell_type == 'rnn':
+                h_prev, _ = rnn_step_forward(emb_prev, h_prev, Wx, Wh, b)
+            else:
+                h_prev,c_prev,  _ = lstm_step_forward(emb_prev, h_prev, c_prev, Wx, Wh, b)
             scores = np.dot(h_prev, W_vocab) + b_vocab
             x_prev = np.argmax(scores, axis=1)
             captions[:, t] = x_prev
